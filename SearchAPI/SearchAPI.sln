@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchAPI", "SearchAPI.csproj", "{582EC126-B9B0-407A-9519-31CE47C0B5C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchAPI", "SearchAPI\SearchAPI.csproj", "{C7BD59B7-9CC0-463D-BDD7-6E0958B5A16A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +8,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{582EC126-B9B0-407A-9519-31CE47C0B5C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{582EC126-B9B0-407A-9519-31CE47C0B5C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{582EC126-B9B0-407A-9519-31CE47C0B5C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{582EC126-B9B0-407A-9519-31CE47C0B5C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7BD59B7-9CC0-463D-BDD7-6E0958B5A16A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7BD59B7-9CC0-463D-BDD7-6E0958B5A16A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7BD59B7-9CC0-463D-BDD7-6E0958B5A16A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7BD59B7-9CC0-463D-BDD7-6E0958B5A16A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
