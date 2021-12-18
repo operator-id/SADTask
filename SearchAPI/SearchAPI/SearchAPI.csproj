@@ -8,6 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Elasticsearch.Net" Version="7.16.0" />
+        <PackageReference Include="Elasticsearch.Net.Aws" Version="7.1.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     </ItemGroup>
 
