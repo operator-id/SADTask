@@ -4,20 +4,20 @@ namespace SearchAPI.Models
 {
     public class Property
     {
-        public int propertyID { get; set; }
+        public int PropertyID { get; set; }
         [Text(Analyzer = "snowball", SearchAnalyzer = "snowball")]
-        public string name { get; set; }
+        public string Name { get; set; }
         [Text(Analyzer = "snowball", SearchAnalyzer = "snowball")]
-        public string formerName { get; set; }
+        public string FormerName { get; set; }
         [Text(Analyzer = "snowball", SearchAnalyzer = "snowball")]
-        public string streetAddress { get; set; }
+        public string StreetAddress { get; set; }
         [Text(Analyzer = "snowball", SearchAnalyzer = "snowball")]
-        public string city { get; set; }
+        public string City { get; set; }
         [Text(Analyzer = "snowball", SearchAnalyzer = "snowball")]
-        public string market { get; set; }
+        public string Market { get; set; }
         [Text(Analyzer = "snowball", SearchAnalyzer = "snowball")]
-        public string state { get; set; }
-        public float lat { get; set; }
-        public float lng { get; set; }
+        public string State { get; set; }
+        public float Lat { get; set; }
+        public float Lng { get; set; }
     }
 }

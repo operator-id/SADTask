@@ -2,6 +2,6 @@
 {
     public class PropertyContainer
     {
-        public Property property { get; set; }
+        public Property Property { get; set; }
     }
 }

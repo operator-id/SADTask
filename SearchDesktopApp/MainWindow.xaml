@@ -1,0 +1,34 @@
+﻿<Window x:Class="SearchDesktopApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SearchDesktopApp"
+        xmlns:models="clr-namespace:SearchDesktopApp.Models"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="20"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="20"></RowDefinition>
+        </Grid.RowDefinitions>
+        <ComboBox x:Name="PropertiesComboBox" Grid.Column="1" Grid.Row="1" IsEditable="True" TextBoxBase.TextChanged="PropertiesComboBox_OnTextChanged">
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="models:PropertyModel">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding FullName}"></TextBlock>
+                        <TextBlock Text="{Binding Location}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+    </Grid>
+    
+</Window>
