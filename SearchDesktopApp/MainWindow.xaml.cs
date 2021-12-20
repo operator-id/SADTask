@@ -28,20 +28,23 @@ namespace SearchDesktopApp
             var searchPhrase = PropertiesComboBox.Text;
             if (string.IsNullOrWhiteSpace(searchPhrase))
             {
-                PropertiesComboBox.IsDropDownOpen = false;
+                //PropertiesComboBox.IsDropDownOpen = false;
                 return;
             }
-            var result = await _apiClient.SearchProperties(searchPhrase);
+            
+            var result = await _apiClient.SearchProperties(searchPhrase, MarketTextBox.Text);
             if (result == null || result.Count < 1)
             {
-                PropertiesComboBox.IsDropDownOpen = false;
+                Properties.Clear();
+                PropertiesComboBox.Items.Refresh();
+                //PropertiesComboBox.IsDropDownOpen = false;
                 return;
             }
             
             Properties.Clear();
             Properties.AddRange(result);
             PropertiesComboBox.Items.Refresh();
-            PropertiesComboBox.IsDropDownOpen = true;
+            //PropertiesComboBox.IsDropDownOpen = true;
         }
     }
 }

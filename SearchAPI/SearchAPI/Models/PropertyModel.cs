@@ -2,7 +2,7 @@
 
 namespace SearchAPI.Models
 {
-    public class Property
+    public class PropertyModel : RealEstateBase
     {
         public int PropertyID { get; set; }
         [Text(Analyzer = "snowball", SearchAnalyzer = "snowball")]
@@ -13,8 +13,6 @@ namespace SearchAPI.Models
         public string StreetAddress { get; set; }
         [Text(Analyzer = "snowball", SearchAnalyzer = "snowball")]
         public string City { get; set; }
-        [Text(Analyzer = "snowball", SearchAnalyzer = "snowball")]
-        public string Market { get; set; }
         [Text(Analyzer = "snowball", SearchAnalyzer = "snowball")]
         public string State { get; set; }
         public float Lat { get; set; }

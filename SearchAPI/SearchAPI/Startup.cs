@@ -20,6 +20,7 @@ namespace SearchAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IElasticSearchService, AwsElasticSearch>();
             var accessKey = Configuration["AWSOpenSearch:AccessKey"];
             var secretKey = Configuration["AWSOpenSearch:SecretKey"];
             var elasticClient = AwsElasticSearchConfig.CreateClient(accessKey, secretKey);

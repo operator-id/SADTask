@@ -11,24 +11,29 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="30"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="20"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
             <RowDefinition Height="20"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="20"></RowDefinition>
         </Grid.RowDefinitions>
-        <ComboBox x:Name="PropertiesComboBox" Grid.Column="1" Grid.Row="1" IsEditable="True" TextBoxBase.TextChanged="PropertiesComboBox_OnTextChanged">
+        <ComboBox x:Name="PropertiesComboBox"  Grid.Row="1" Grid.Column="1" IsEditable="True" TextBoxBase.TextChanged="PropertiesComboBox_OnTextChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate DataType="models:PropertyModel">
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="{Binding FullName}"></TextBlock>
-                        <TextBlock Text="{Binding Location}"></TextBlock>
+                        <TextBlock Text="{Binding Details}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+        <TextBox x:Name="MarketTextBox" Grid.Row="1" Grid.Column="3" Margin="30,0">
+            
+        </TextBox>
     </Grid>
     
 </Window>

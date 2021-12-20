@@ -15,7 +15,6 @@ namespace SearchDesktopApp
 
         public ApiClient(string baseUrl)
         {
-            System.Net.ServicePointManager.ServerCertificateValidationCallback = (senderX, certificate, chain, sslPolicyErrors) => true;
             _client = new HttpClient
             {
                 BaseAddress = new Uri(baseUrl + "/api")

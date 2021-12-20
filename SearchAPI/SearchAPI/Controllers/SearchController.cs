@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Nest;
 using Newtonsoft.Json;
 using SearchAPI.Models;
+using SearchAPI.Services;
 
 namespace SearchAPI.Controllers
 {
@@ -14,32 +10,24 @@ namespace SearchAPI.Controllers
     [Route("api")]
     public class SearchController : Controller
     {
-        private readonly IElasticClient _client;
+        private readonly IElasticSearchService _searchService;
 
-        public SearchController(IElasticClient client)
+        public SearchController(IElasticSearchService searchService)
         {
-            _client = client;
+            _searchService = searchService;
         }
-        
+
         [HttpGet("[action]/{searchPhrase}/{market?}/{limit:int?}")]
         public async Task<IActionResult> Search(string searchPhrase, string market = null, int limit = 25)
         {
-            var boolQuery = new BoolQuery
+            var response = await _searchService.SearchAsync<RealEstateBase>(searchPhrase, market, limit);
+            var responseMessage = JsonConvert.SerializeObject(response);
+            return new ContentResult
             {
-                Must = new QueryContainer[] { new MultiMatchQuery
-                    {
-                        Query = searchPhrase,
-                        Fields = "*"
-                    }
-                }
+                Content = responseMessage,
+                ContentType = "application/json",
+                StatusCode = 200
             };
-
-            var search = await _client.SearchAsync<Property>(s =>
-                s.Index("properties").Query(q => boolQuery).Size(limit));
-            Console.WriteLine(search.DebugInformation);
-            Console.WriteLine(search.ServerError);
-            Console.WriteLine("Found " + search.Hits.Count + " matches");
-            return Ok(search.Documents);
         }
         
         [HttpGet("index-properties")]
