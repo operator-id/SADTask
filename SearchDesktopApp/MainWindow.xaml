@@ -27,6 +27,7 @@
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="{Binding FullName}"></TextBlock>
                         <TextBlock Text="{Binding Details}"></TextBlock>
+                        <TextBlock Text="{Binding Market}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>

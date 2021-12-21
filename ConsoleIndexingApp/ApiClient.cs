@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
+using ConsoleIndexingApp.Schema;
 using Newtonsoft.Json;
 
 namespace ConsoleIndexingApp
@@ -17,28 +19,22 @@ namespace ConsoleIndexingApp
         {
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri(baseUrl);
-            //System.Net.ServicePointManager.ServerCertificateValidationCallback = (senderX, certificate, chain, sslPolicyErrors) => true;
         }
 
-        public static async Task<string> Test()
+        public static async Task<string> IndexFiles<TContainer, TDocument>(string filePath, string indexName, string typeName)
+            where TContainer : IContainer<TDocument>
+            where TDocument : class
         {
-            var uri = _httpClient.BaseAddress + "api/test";
-            Console.WriteLine(uri);
-            var response = await _httpClient.GetAsync(uri);
-            return response.ToString();
-        }
-
-        public static async Task<string> IndexFiles(string filePath, string indexName)
-        {
-            using (var fs = File.OpenRead(filePath))
-            using (var streamContent = new StreamContent(fs))
+            using (var fileStream = File.OpenRead(filePath))
             {
-                var fileContent = await streamContent.ReadAsStringAsync();
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("multipart/form-data"));
+                var json = await ParseTextFromStream<TContainer, TDocument>(fileStream);
+                //Console.WriteLine(JsonConvert.SerializeObject(json));
                 var indexParams = new IndexParams
                 {
                     IndexName = indexName,
-                    JsonString = fileContent
+                    JsonString = JsonConvert.SerializeObject(json),
+                    ModelType = typeName
                 };
                 
                 var request = new HttpRequestMessage
@@ -49,9 +45,38 @@ namespace ConsoleIndexingApp
                 };
                 
                 var response = await _httpClient.SendAsync(request);
-                return response.StatusCode + " " + response.ReasonPhrase;
+                return response.ReasonPhrase;
             }
 
+        }
+
+        private static async Task<List<TDocument>> ParseTextFromStream<TContainer, TDocument>(Stream streamContent)
+            where TContainer : IContainer<TDocument>
+        {
+            Console.WriteLine("Parsing the file...");
+            
+            var items = new List<TDocument>();
+            var serializer = new JsonSerializer();
+            using (var stringReader = new StreamReader(streamContent))
+            using (var jsonReader = new JsonTextReader(stringReader))
+            {
+                for (; await jsonReader.ReadAsync();)
+                {
+                    if (jsonReader.TokenType != JsonToken.StartObject)
+                    {
+                        continue;
+                    }
+                    var container = serializer.Deserialize<TContainer>(jsonReader);
+                    if (container == null)
+                    {
+                        continue;
+                    }
+                    items.Add(container.GetInnerComponent());
+                }
+
+            }
+
+            return items;
         }
     }
 }

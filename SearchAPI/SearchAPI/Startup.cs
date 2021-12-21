@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Nest;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using SearchAPI.Services;
 
 namespace SearchAPI

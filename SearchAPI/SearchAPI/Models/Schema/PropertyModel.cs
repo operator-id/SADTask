@@ -1,6 +1,6 @@
 ﻿using Nest;
 
-namespace SearchAPI.Models
+namespace SearchAPI.Models.Schema
 {
     [ElasticsearchType(IdProperty = "PropertyId")]
     public class PropertyModel : RealEstateBase

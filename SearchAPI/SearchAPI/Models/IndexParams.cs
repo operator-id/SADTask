@@ -7,5 +7,7 @@ namespace SearchAPI.Models
     {
         public string JsonString { get; set; }
         public string IndexName { get; set; }
+        
+        public string ModelType { get; set; }
     }
 }

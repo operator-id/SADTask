@@ -2,16 +2,27 @@
 {
     public class RealEstateBase
     {
-        public string Market { get; set; }
-        
+        private string _market;
+
+        public string Market
+        {
+            get { return string.Format("Market: {0}", _market); }
+            set { _market = value; }
+        }
+
+        public string Name { get; set; }
+        public string State { get; set; }
         public virtual string FullName
         {
-            get { return string.Empty; }
+            get { return Name; }
         }
 
         public virtual string Details
         {
-            get { return string.Empty; }
+            get
+            {
+                return State;
+            }
         }
     }
 }

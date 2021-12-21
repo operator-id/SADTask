@@ -23,7 +23,7 @@ namespace SearchDesktopApp
             };
         }
 
-        public async Task<List<PropertyModel>> SearchProperties(string searchPhrase, string market = null)
+        public async Task<List<RealEstateBase>> Search(string searchPhrase, string market = null)
         {
             var address = _client.BaseAddress + "/search";
             var searchParams = new SearchParams(searchPhrase, market, 2);
@@ -40,7 +40,8 @@ namespace SearchDesktopApp
             if (response.IsSuccessStatusCode)
             {
                 var text = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<List<PropertyModel>>(text);
+                Console.WriteLine(text);
+                return JsonConvert.DeserializeObject<List<RealEstateBase>>(text);
             }
 
             return null;

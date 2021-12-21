@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using SearchDesktopApp.Models;
@@ -12,7 +10,7 @@ namespace SearchDesktopApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        public List<PropertyModel> Properties = new List<PropertyModel>();
+        public List<RealEstateBase> Properties = new List<RealEstateBase>();
 
         private readonly ApiClient _apiClient;
 
@@ -32,7 +30,7 @@ namespace SearchDesktopApp
                 return;
             }
             
-            var result = await _apiClient.SearchProperties(searchPhrase, MarketTextBox.Text);
+            var result = await _apiClient.Search(searchPhrase, MarketTextBox.Text);
             if (result == null || result.Count < 1)
             {
                 Properties.Clear();

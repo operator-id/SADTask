@@ -1,4 +1,4 @@
-﻿namespace SearchDesktopApp.Models
+﻿namespace ConsoleIndexingApp.Schema
 {
     public class ManagementModel : RealEstateBase
     {

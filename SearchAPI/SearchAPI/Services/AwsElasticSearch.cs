@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Nest;
 using Newtonsoft.Json;
 using SearchAPI.Models;
+using SearchAPI.Models.Schema;
 
 namespace SearchAPI.Services
 {
@@ -20,19 +21,43 @@ namespace SearchAPI.Services
         {
             _client = client;
         }
+        
+        public async Task IndexItemsAsync<T>(IndexParams indexParams)
+            where T : RealEstateBase
+        {
+            var index = indexParams.IndexName;
+            var existsResponse = await _client.Indices.ExistsAsync(index);
+            if (!existsResponse.Exists)
+            {
+                await _client.Indices.CreateAsync(index,
+                    x => x
+                        .Map<T>(p => p.AutoMap<T>())
+                );
+            }
+
+            if (existsResponse.Exists)
+            {
+                Console.WriteLine("Deleting the existing documents for the index {0}...", index);
+                await ExecuteBulkOperationAsync<T>(indexParams, DeleteManyExtensions.DeleteManyAsync);
+            }
+
+            await ExecuteBulkOperationAsync<T>(indexParams, IndexManyExtensions.IndexManyAsync);
+        }
 
         public async Task<IReadOnlyCollection<T>> SearchAsync<T>(SearchParams searchParams) 
             where T : class
         {
             var boolQuery = CreateQuery(searchParams.SearchPhrase, searchParams.Market);
-
-            var search = await _client.SearchAsync<PropertyModel>(s =>
-                s.Index("properties").Query(q => boolQuery).Size(searchParams.Limit));
+            var search = await _client.SearchAsync<T>(s =>
+                s.Index("properties")
+                    .Query(q => boolQuery)
+                    .Size(searchParams.Limit)
+            );
             
             Console.WriteLine(search.DebugInformation);
 
             Console.WriteLine("Found " + search.Hits.Count + " matches");
-            return new List<T>((IEnumerable<T>) search.Documents);
+            return search.Documents;
         }
 
         public Task<string> SuggestAsync(SearchParams searchParams)
@@ -40,64 +65,43 @@ namespace SearchAPI.Services
             throw new NotImplementedException();
         }
 
-        public async Task IndexItemsAsync<T>(IndexParams indexParams)
+        private async Task ExecuteBulkOperationAsync<T>(IndexParams indexParams, BulkOperationAsync<T> bulkOperationTask) 
             where T : RealEstateBase
         {
-
-            var index = indexParams.IndexName;
-            var existsResponse = await _client.Indices.ExistsAsync(index);
-            if (!existsResponse.Exists)
-            {
-                await _client.Indices.CreateAsync(index,
-                    x => x
-                        .Map<PropertyModel>(p => p.AutoMap<PropertyModel>())
-                );
-            }
-            
-            {
-                if (existsResponse.Exists)
-                {
-                    Console.WriteLine("Deleting the existing documents for the index {0}...", index);
-                    await ExecuteBulkOperationAsync<T>(index, indexParams.JsonString, DeleteManyExtensions.DeleteManyAsync);
-                }
-                await ExecuteBulkOperationAsync<T>(index, indexParams.JsonString, IndexManyExtensions.IndexManyAsync);
-            }
-        }
-
-        private async Task ExecuteBulkOperationAsync<T>(string indexName, string text, BulkOperationAsync<PropertyModel> bulkOperationTask) 
-            where T : RealEstateBase
-        {
-            const int step = 2000;
+            const int step = 5000;
             var serializer = new JsonSerializer();
-            using (var stringReader = new StringReader(text))
+            using (var stringReader = new StringReader(indexParams.JsonString))
             using (var jsonReader = new JsonTextReader(stringReader))
             {
-                var items = new List<PropertyModel>();
+                var items = new List<T>();
                 
                 for (; await jsonReader.ReadAsync();)
                 {
-                    //Console.WriteLine(jsonReader.Value);
                     if (jsonReader.TokenType != JsonToken.StartObject)
                     {
                         continue;
                     }
 
-                    var item = serializer.Deserialize<PropertyContainer>(jsonReader);
-                    items.Add(item.Property);
+                    var type = TypeHelper.GetTypeFromName(indexParams.ModelType);
+                    if (type == null)
+                    {
+                        continue;
+                    }
+                    var item = (T) serializer.Deserialize(jsonReader, type);
+                    items.Add(item);
                     if (items.Count < step)
                     {
                         continue;
                     }
                     
-                    var result = await bulkOperationTask(_client,  items, indexName);
-                    //_client.DeleteManyAsync()
+                    var result = await bulkOperationTask(_client,  items, indexParams.IndexName);
                     Console.WriteLine(result.DebugInformation);
                     items.Clear();
                 }
 
                 if (items.Count > 0)
                 {
-                    await bulkOperationTask(_client,  items, indexName);
+                    await bulkOperationTask(_client,  items, indexParams.IndexName);
                 }
             }
         }
@@ -116,18 +120,21 @@ namespace SearchAPI.Services
                 }
             };
             
-            if (markets != null && markets.Count > 0)
+            if (markets != null && markets.Count > 0 && !string.IsNullOrWhiteSpace(markets[0]))
             {
+                var market = markets[0];
                 boolQuery.Filter = new QueryContainer[]
                 {
                     new MatchQuery
                     {
-                        Query = markets[0],//todo
-                        Field = "market"
+                        Query = market,//todo
+                        Field = "market",
+                        IsVerbatim = true
                     }
                 };
             }
 
+            
             return boolQuery;
         }
     }

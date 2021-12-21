@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.NetworkInformation;
 using System.Threading.Tasks;
+using ConsoleIndexingApp.Schema;
 
 namespace ConsoleIndexingApp
 {
@@ -20,17 +17,16 @@ namespace ConsoleIndexingApp
             var url = "https://localhost:7299";
             Console.WriteLine("Sending a request to " + url);
             ApiClient.Init(url);
-            var result = await ApiClient.Test();
 
+            Console.WriteLine("Indexing properties.json...");
+            var result = await ApiClient.IndexFiles<PropertyContainer, PropertyModel>("properties.json", "properties", typeof(PropertyModel).Name);
             Console.WriteLine(result);
-            Console.WriteLine("Indexing properties...");
-            //var path = Console.ReadLine();
-            result = await ApiClient.IndexFiles("properties.json", "properties");
+            Console.WriteLine("Indexing mgmt.json...");
+            result = await ApiClient.IndexFiles<ManagementContainer, ManagementModel>("mgmt.json", "properties", typeof(ManagementModel).Name);
             Console.WriteLine(result);
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
         }
-
 
 
         private static string GetUrlInput()
