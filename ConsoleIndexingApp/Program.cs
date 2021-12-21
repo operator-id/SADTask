@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
@@ -14,30 +16,22 @@ namespace ConsoleIndexingApp
 
         private static async Task ReadInput()
         {
-            var url = GetUrlInput();
+            //var url = GetUrlInput();
+            var url = "https://localhost:7299";
             Console.WriteLine("Sending a request to " + url);
-            var result = await GetPage(url);
+            ApiClient.Init(url);
+            var result = await ApiClient.Test();
+
+            Console.WriteLine(result);
+            Console.WriteLine("Indexing properties...");
+            //var path = Console.ReadLine();
+            result = await ApiClient.IndexFiles("properties.json", "properties");
             Console.WriteLine(result);
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
-            // while (true)
-            // {
-            //
-            //     break;
-            // }
         }
 
-        private static async Task<string> GetPage(string url)
-        {
-            var client = new HttpClient();
-            System.Net.ServicePointManager.ServerCertificateValidationCallback = (senderX, certificate, chain, sslPolicyErrors) => true;
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.BaseAddress = new Uri(url + "/test");
-            Console.WriteLine(client.BaseAddress);
-            var response = await client.GetAsync(client.BaseAddress);
-            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
-            return response.ToString();
-        }
+
 
         private static string GetUrlInput()
         {

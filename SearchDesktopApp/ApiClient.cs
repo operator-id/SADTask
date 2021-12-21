@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Net.Mime;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Newtonsoft.Json;
@@ -23,17 +25,21 @@ namespace SearchDesktopApp
 
         public async Task<List<PropertyModel>> SearchProperties(string searchPhrase, string market = null)
         {
-            var address = _client.BaseAddress + "/search/" + searchPhrase;
-            if (!string.IsNullOrWhiteSpace(market))
+            var address = _client.BaseAddress + "/search";
+            var searchParams = new SearchParams(searchPhrase, market, 2);
+            
+            var request = new HttpRequestMessage
             {
-                address += "/" + market;
-            }
-            var response = await _client.GetAsync(address);
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(address),
+                Content = new StringContent(JsonConvert.SerializeObject(searchParams), Encoding.UTF8, MediaTypeNames.Application.Json)
+            };
+    
+            var response = await _client.SendAsync(request);
             Console.WriteLine(response.StatusCode);
             if (response.IsSuccessStatusCode)
             {
                 var text = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(text);
                 return JsonConvert.DeserializeObject<List<PropertyModel>>(text);
             }
 
