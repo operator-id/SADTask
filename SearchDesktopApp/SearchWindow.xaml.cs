@@ -25,26 +25,26 @@ namespace SearchDesktopApp
         private async void PropertiesComboBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             var searchPhrase = PropertiesComboBox.Text;
+            if (!PropertiesComboBox.IsDropDownOpen)
+            {
+                PropertiesComboBox.IsDropDownOpen = true;
+            }
+
             if (string.IsNullOrWhiteSpace(searchPhrase))
             {
-                PropertiesComboBox.IsDropDownOpen = false;
                 return;
             }
             
             var result = await _apiClient.Search(searchPhrase, MarketTextBox.Text);
+            
             if (result == null || result.Count < 1)
             {
-                Properties.Clear();
-                PropertiesComboBox.Items.Refresh();
-                PropertiesComboBox.IsDropDownOpen = false;
                 return;
             }
             
             Properties.Clear();
             Properties.AddRange(result);
             PropertiesComboBox.Items.Refresh();
-            PropertiesComboBox.IsDropDownOpen = true;
-            
         }
     }
 }

@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using SearchAPI.Models;
 using SearchAPI.Models.Schema;
 
-namespace SearchAPI
+namespace SearchAPI.Util
 {
     public static class JsonParsingHelper
     {
@@ -24,7 +24,7 @@ namespace SearchAPI
                         continue;
                     }
 
-                    var type = TypeHelper.GetTypeFromName(indexParams.ModelType);
+                    var type = ReflectionHelper.GetTypeFromName(indexParams.ModelType);
                     if (type == null)
                     {
                         continue;

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SearchDesktopApp"
         xmlns:models="clr-namespace:SearchDesktopApp.Models"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Search" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"></ColumnDefinition>

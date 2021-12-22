@@ -15,8 +15,7 @@ namespace ConsoleIndexingApp
         private static async Task StartProgram()
         {
             Console.WriteLine("Please enter the api url");
-            //var url = Console.ReadLine();
-            var url = "https://localhost:7299";
+            var url = Console.ReadLine();
             try
             {
                 ApiClient.Init(url);

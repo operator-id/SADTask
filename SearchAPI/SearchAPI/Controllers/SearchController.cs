@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Elasticsearch.Net;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SearchAPI.Models;
-using SearchAPI.Models.Schema;
 using SearchAPI.Services;
 
 namespace SearchAPI.Controllers
@@ -28,7 +28,11 @@ namespace SearchAPI.Controllers
             }
             
             var response = await _searchService.SearchAsync(searchParams);
-            var responseMessage = JsonConvert.SerializeObject(response);
+            if (!response.IsValid)
+            {
+                return StatusCode(500);
+            }
+            var responseMessage = JsonConvert.SerializeObject(response.Documents);
             
             return new ContentResult
             {
@@ -42,12 +46,20 @@ namespace SearchAPI.Controllers
         public async Task<IActionResult> Index([FromBody] IndexParams indexParams)
         {
             if (string.IsNullOrWhiteSpace(indexParams.IndexName))
-
             {
                 return new BadRequestResult();
             }
-            await _searchService.IndexItemsAsync(indexParams);
-            return Ok();
+
+            try
+            {
+                await _searchService.IndexItemsAsync(indexParams);
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+
         }
     }
 }
