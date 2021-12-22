@@ -25,6 +25,7 @@ namespace ConsoleIndexingApp
             where TContainer : IContainer<TDocument>
             where TDocument : class
         {
+            Console.WriteLine("Indexing {0}...", filePath);
             using (var fileStream = File.OpenRead(filePath))
             {
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("multipart/form-data"));
@@ -43,7 +44,7 @@ namespace ConsoleIndexingApp
                     RequestUri = new Uri(_httpClient.BaseAddress + "api/index"),
                     Content = new StringContent(JsonConvert.SerializeObject(indexParams), Encoding.UTF8, MediaTypeNames.Application.Json)
                 };
-                
+                Console.WriteLine("Sending indexing request to the server...");
                 var response = await _httpClient.SendAsync(request);
                 return response.ReasonPhrase;
             }

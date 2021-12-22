@@ -1,4 +1,4 @@
-﻿<Window x:Class="SearchDesktopApp.MainWindow"
+﻿<Window x:Class="SearchDesktopApp.SearchWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -12,7 +12,7 @@
             <ColumnDefinition Width="20"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="30"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="300"></ColumnDefinition>
             <ColumnDefinition Width="20"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -21,7 +21,7 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="20"></RowDefinition>
         </Grid.RowDefinitions>
-        <ComboBox x:Name="PropertiesComboBox"  Grid.Row="1" Grid.Column="1" IsEditable="True" TextBoxBase.TextChanged="PropertiesComboBox_OnTextChanged">
+        <ComboBox x:Name="PropertiesComboBox" IsTextSearchEnabled="False"  Grid.Row="1" Grid.Column="1" IsEditable="True" TextBoxBase.TextChanged="PropertiesComboBox_OnTextChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate DataType="models:PropertyModel">
                     <StackPanel Orientation="Vertical">

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using ConsoleIndexingApp.Schema;
 
@@ -8,31 +9,45 @@ namespace ConsoleIndexingApp
     {
         public static void Main(string[] args)
         {
-            ReadInput().GetAwaiter().GetResult();
+            StartProgram().GetAwaiter().GetResult();
         }
 
-        private static async Task ReadInput()
+        private static async Task StartProgram()
         {
-            //var url = GetUrlInput();
+            Console.WriteLine("Please enter the api url");
+            //var url = Console.ReadLine();
             var url = "https://localhost:7299";
-            Console.WriteLine("Sending a request to " + url);
-            ApiClient.Init(url);
-
-            Console.WriteLine("Indexing properties.json...");
-            var result = await ApiClient.IndexFiles<PropertyContainer, PropertyModel>("properties.json", "properties", typeof(PropertyModel).Name);
-            Console.WriteLine(result);
-            Console.WriteLine("Indexing mgmt.json...");
-            result = await ApiClient.IndexFiles<ManagementContainer, ManagementModel>("mgmt.json", "properties", typeof(ManagementModel).Name);
-            Console.WriteLine(result);
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+            try
+            {
+                ApiClient.Init(url);
+                await TryIndexFileAsync<PropertyContainer, PropertyModel>("properties.json", "property", typeof(PropertyModel).Name);
+                await TryIndexFileAsync<ManagementContainer, ManagementModel>("mgmt.json", "management", typeof(ManagementModel).Name);
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
-
-        private static string GetUrlInput()
+        private static async Task TryIndexFileAsync<TContainer, TDocument>(string filePath, string indexName, string typeName)
+            where TContainer : IContainer<TDocument>
+            where TDocument : class
         {
-            Console.WriteLine("Please enter the url of the API:\n");
-            return Console.ReadLine();
+            if (!File.Exists(filePath))
+            {
+                ShowMissingFileWarning(filePath);
+                return;
+            }
+            var result = await ApiClient.IndexFiles<TContainer, TDocument>(filePath, indexName, typeName);
+            Console.WriteLine(result);
+        }
+
+        private static void ShowMissingFileWarning(string filePath)
+        {
+            Console.WriteLine("Can't find file {0} in the output folder {1}. Make sure to include it", filePath, Directory.GetCurrentDirectory());
         }
 
     }

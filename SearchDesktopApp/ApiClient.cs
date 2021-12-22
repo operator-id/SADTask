@@ -40,7 +40,7 @@ namespace SearchDesktopApp
             if (response.IsSuccessStatusCode)
             {
                 var text = await response.Content.ReadAsStringAsync();
-                
+                //Console.WriteLine(text);
                 return await ParseText(text);
             }
 

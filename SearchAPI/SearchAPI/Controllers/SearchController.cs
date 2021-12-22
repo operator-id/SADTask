@@ -22,8 +22,14 @@ namespace SearchAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Search([FromBody] SearchParams searchParams)
         {
+            if (searchParams.IndexNames == null || searchParams.IndexNames.Count < 1)
+            {
+                return new BadRequestResult();
+            }
+            
             var response = await _searchService.SearchAsync(searchParams);
             var responseMessage = JsonConvert.SerializeObject(response);
+            
             return new ContentResult
             {
                 Content = responseMessage,
@@ -31,11 +37,17 @@ namespace SearchAPI.Controllers
                 StatusCode = 200
             };
         }
-        
+
         [HttpPost]
-        public async Task Index(IndexParams indexParams)
+        public async Task<IActionResult> Index([FromBody] IndexParams indexParams)
         {
-            await _searchService.IndexItemsAsync<RealEstateBase>(indexParams);
+            if (string.IsNullOrWhiteSpace(indexParams.IndexName))
+
+            {
+                return new BadRequestResult();
+            }
+            await _searchService.IndexItemsAsync(indexParams);
+            return Ok();
         }
     }
 }

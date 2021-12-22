@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Nest;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using SearchAPI.Services;
 
 namespace SearchAPI
@@ -22,11 +19,9 @@ namespace SearchAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<IElasticSearchService, AwsElasticSearch>();
-            var accessKey = Configuration["AWSOpenSearch:AccessKey"];
-            var secretKey = Configuration["AWSOpenSearch:SecretKey"];
-            var elasticClient = AwsElasticSearchConfig.CreateClient(accessKey, secretKey);
+            var elasticClient = AwsElasticSearchConfig.CreateClient(Configuration);
             services.AddSingleton(elasticClient);
+            services.AddTransient<IElasticSearchService, AwsElasticSearch>();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();

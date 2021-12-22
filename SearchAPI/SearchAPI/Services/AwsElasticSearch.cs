@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
 using Nest;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SearchAPI.Models;
 using SearchAPI.Models.Schema;
 
@@ -16,127 +10,43 @@ namespace SearchAPI.Services
     public class AwsElasticSearch : IElasticSearchService
     {
         private readonly IElasticClient _client;
-        private delegate Task<BulkResponse> BulkOperationAsync<in T>(IElasticClient client, IEnumerable<T> objects, 
-            IndexName index = null, CancellationToken cancellationToken = default(CancellationToken));
+
         
         public AwsElasticSearch(IElasticClient client)
         {
             _client = client;
         }
         
-        public async Task IndexItemsAsync<T>(IndexParams indexParams)
-            where T : RealEstateBase
+        public async Task IndexItemsAsync(IndexParams indexParams)
         {
             var index = indexParams.IndexName;
+            await _client.Indices.DeleteAsync(indexParams.IndexName);
             var existsResponse = await _client.Indices.ExistsAsync(index);
+            var documentType = TypeHelper.GetTypeFromName(indexParams.ModelType);
             if (!existsResponse.Exists)
             {
-                await _client.Indices.CreateAsync(index,
-                    x => x
-                        .Map<T>(p => p.AutoMap<T>())
-                );
+                await _client.Indices.CreateAsync(index, ElasticSearchHelper.CreateIndexingSelector(documentType));
             }
-
+            
+            var items = await JsonParsingHelper.ParseFromTextAsync(indexParams);
             if (existsResponse.Exists)
             {
-                Console.WriteLine("Deleting the existing documents for the index {0}...", index);
-                await ExecuteBulkOperationAsync<T>(indexParams, DeleteManyExtensions.DeleteManyAsync);
+                await _client.DeleteManyAsync(items, indexParams.IndexName);
             }
-
-            await ExecuteBulkOperationAsync<T>(indexParams, IndexManyExtensions.IndexManyAsync);
+            await _client.IndexManyAsync(items, indexParams.IndexName);
         }
 
         public async Task<IReadOnlyCollection<dynamic>> SearchAsync(SearchParams searchParams)
         {
-            var boolQuery = CreateQuery(searchParams.SearchPhrase, searchParams.Market);
-            var search = await _client.SearchAsync<dynamic>(s =>
-                s.Index("properties")
-                    .Query(q => boolQuery)
+            var boolQuery = ElasticSearchHelper.CreateQuery(searchParams.SearchPhrase, searchParams.Market);
+            var search = await _client.SearchAsync<dynamic>(selector =>
+                selector.Index(searchParams.IndexNames.ToArray())
+                    .Query(query => boolQuery)
                     .Size(searchParams.Limit)
+                    .Sort(sort => sort.Descending(SortSpecialField.Score))
             );
             
-            Console.WriteLine(search.DebugInformation);
-
-            Console.WriteLine("Found " + search.Hits.Count + " matches");
             return search.Documents;
-        }
-
-        public Task<string> SuggestAsync(SearchParams searchParams)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task ExecuteBulkOperationAsync<T>(IndexParams indexParams, BulkOperationAsync<T> bulkOperationTask) 
-            where T : RealEstateBase
-        {
-            const int step = 5000;
-            var serializer = new JsonSerializer();
-            using (var stringReader = new StringReader(indexParams.JsonString))
-            using (var jsonReader = new JsonTextReader(stringReader))
-            {
-                var items = new List<T>();
-                
-                for (; await jsonReader.ReadAsync();)
-                {
-                    if (jsonReader.TokenType != JsonToken.StartObject)
-                    {
-                        continue;
-                    }
-
-                    var type = TypeHelper.GetTypeFromName(indexParams.ModelType);
-                    if (type == null)
-                    {
-                        continue;
-                    }
-                    var item = (T) serializer.Deserialize(jsonReader, type);
-                    items.Add(item);
-                    if (items.Count < step)
-                    {
-                        continue;
-                    }
-                    
-                    var result = await bulkOperationTask(_client,  items, indexParams.IndexName);
-                    Console.WriteLine(result.DebugInformation);
-                    items.Clear();
-                }
-
-                if (items.Count > 0)
-                {
-                    await bulkOperationTask(_client,  items, indexParams.IndexName);
-                }
-            }
-        }
-
-        private static BoolQuery CreateQuery(string searchPhrase, List<string> markets)
-        {
-            var boolQuery = new BoolQuery
-            {
-                Must = new QueryContainer[]
-                {
-                    new MultiMatchQuery
-                    {
-                        Query = searchPhrase,
-                        Fields = "*"
-                    }
-                }
-            };
-            
-            if (markets != null && markets.Count > 0 && !string.IsNullOrWhiteSpace(markets[0]))
-            {
-                var market = markets[0];
-                boolQuery.Filter = new QueryContainer[]
-                {
-                    new MatchQuery
-                    {
-                        Query = market,//todo
-                        Field = "market",
-                        IsVerbatim = true
-                    }
-                };
-            }
-
-            
-            return boolQuery;
         }
     }
 }

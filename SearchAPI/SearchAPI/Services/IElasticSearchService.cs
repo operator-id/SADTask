@@ -9,9 +9,6 @@ namespace SearchAPI.Services
     public interface IElasticSearchService
     {
         Task<IReadOnlyCollection<dynamic>> SearchAsync(SearchParams searchParams);
-        Task<string> SuggestAsync(SearchParams searchParams);
-        
-        Task IndexItemsAsync<T> (IndexParams indexParams)
-            where T : RealEstateBase;
+        Task IndexItemsAsync(IndexParams indexParams);
     }
 }

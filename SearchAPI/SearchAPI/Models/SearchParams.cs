@@ -17,6 +17,7 @@ namespace SearchAPI.Models
         }
 
         public List<string> Market { get; set; }
+        public List<string> IndexNames { get; set; }
 
         public int Limit
         {

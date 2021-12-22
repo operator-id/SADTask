@@ -9,6 +9,8 @@ namespace SearchDesktopApp.Models
         public List<string> Market { get; set; }
 
         public int Limit { get; set; }
+        
+        public List<string> IndexNames { get; set; }
 
         public int MinSearchCharacters { get; set; }
 
@@ -17,6 +19,7 @@ namespace SearchDesktopApp.Models
             SearchPhrase = searchPhrase;
             Market = market == null ? null : new List<string> {market};
             MinSearchCharacters = minSearchCharacters;
+            IndexNames = new List<string> {"property", "management"};
         }
     }
 }
