@@ -6,6 +6,8 @@ Requirements:
 - .NET 6.0 SDK
 - Setup an SSL certificate for the API app
 
+Important: Make sure to provide the keys first in order for the API to function, otherwise the server will drop the error silently.
+
 In order to authorize to the AWS you need to provide the user secrets:
 - "AWSOpenSearch:AccessKey" : {ACCESS_KEY}
 - "AWSOpenSearch:SecretKey" : {SECRET_KEY}
