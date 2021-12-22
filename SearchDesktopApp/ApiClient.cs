@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SearchDesktopApp.Models;
 
 namespace SearchDesktopApp
@@ -40,11 +40,43 @@ namespace SearchDesktopApp
             if (response.IsSuccessStatusCode)
             {
                 var text = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(text);
-                return JsonConvert.DeserializeObject<List<RealEstateBase>>(text);
+                
+                return await ParseText(text);
             }
 
             return null;
+        }
+
+        private static async Task<List<RealEstateBase>> ParseText(string text)
+        {
+            var items = new List<RealEstateBase>();
+            using (var stringReader = new StringReader(text))
+            using (var jsonReader = new JsonTextReader(stringReader))
+            {
+                for (; await jsonReader.ReadAsync();)
+                {
+                    if (jsonReader.TokenType != JsonToken.StartObject)
+                    {
+                        continue;
+                    }
+
+                    var jObject = await JObject.LoadAsync(jsonReader);
+                    if (jObject["typeName"] == null)
+                    {
+                        throw new ArgumentNullException();
+                    }
+                    var type = TypeHelper.GetTypeFromName(jObject["typeName"].ToString());
+                    var item = jObject.ToObject(type);
+                    if (item == null)
+                    {
+                        continue;
+                    }
+                    items.Add(item as RealEstateBase);
+                }
+
+            }
+
+            return items;
         }
     }
 }

@@ -8,5 +8,13 @@ namespace SearchAPI.Models.Schema
         public string Market { get; set; }
         public string Name { get; set; }
         public string State { get; set; }
+
+        public string TypeName
+        {
+            get
+            {
+                return GetType().Name;
+            }
+        }
     }
 }

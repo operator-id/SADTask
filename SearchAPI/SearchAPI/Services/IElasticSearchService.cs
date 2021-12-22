@@ -8,9 +8,7 @@ namespace SearchAPI.Services
 {
     public interface IElasticSearchService
     {
-        Task<IReadOnlyCollection<T>> SearchAsync<T>(SearchParams searchParams) 
-            where T : class;
-
+        Task<IReadOnlyCollection<dynamic>> SearchAsync(SearchParams searchParams);
         Task<string> SuggestAsync(SearchParams searchParams);
         
         Task IndexItemsAsync<T> (IndexParams indexParams)

@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Elasticsearch.Net;
 using Nest;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SearchAPI.Models;
 using SearchAPI.Models.Schema;
 
@@ -44,11 +46,10 @@ namespace SearchAPI.Services
             await ExecuteBulkOperationAsync<T>(indexParams, IndexManyExtensions.IndexManyAsync);
         }
 
-        public async Task<IReadOnlyCollection<T>> SearchAsync<T>(SearchParams searchParams) 
-            where T : class
+        public async Task<IReadOnlyCollection<dynamic>> SearchAsync(SearchParams searchParams)
         {
             var boolQuery = CreateQuery(searchParams.SearchPhrase, searchParams.Market);
-            var search = await _client.SearchAsync<T>(s =>
+            var search = await _client.SearchAsync<dynamic>(s =>
                 s.Index("properties")
                     .Query(q => boolQuery)
                     .Size(searchParams.Limit)

@@ -24,5 +24,7 @@
                 return State;
             }
         }
+        
+        public string TypeName { get; set; }
     }
 }

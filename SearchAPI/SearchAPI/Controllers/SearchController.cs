@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SearchAPI.Models;
 using SearchAPI.Models.Schema;
 using SearchAPI.Services;
@@ -21,7 +22,7 @@ namespace SearchAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Search([FromBody] SearchParams searchParams)
         {
-            var response = await _searchService.SearchAsync<RealEstateBase>(searchParams);
+            var response = await _searchService.SearchAsync(searchParams);
             var responseMessage = JsonConvert.SerializeObject(response);
             return new ContentResult
             {

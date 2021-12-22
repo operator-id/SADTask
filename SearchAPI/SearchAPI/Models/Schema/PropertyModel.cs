@@ -14,5 +14,6 @@ namespace SearchAPI.Models.Schema
         public string City { get; set; }
         public float Lat { get; set; }
         public float Lng { get; set; }
+
     }
 }
